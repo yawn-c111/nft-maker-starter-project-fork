@@ -145,9 +145,9 @@ const NftUploader = () => {
 
 
   const renderNotConnectedContainer = () => (
-      <button onClick={connectWallet} className="cta-button connect-wallet-button">
+      <Button variant="contained" onClick={connectWallet} className="cta-button connect-wallet-button">
         Connect to Wallet
-      </button>
+      </Button>
     );
   /*
    * ページがロードされたときに useEffect()内の関数が呼び出されます。
@@ -179,15 +179,12 @@ const NftUploader = () => {
 
   return (
     <div className="outerBox">
+      {currentAccount === "" && renderNotConnectedContainer()}
       <p>残りNFT： {remainingNFTs} / 50</p>
       <Button variant="contained" href="https://testnets.opensea.io/collection/tanyanft-yosfwqzk4l">
         OpenSea でコレクションを表示
       </Button>
-      {currentAccount === "" ? (
-        renderNotConnectedContainer()
-      ) : (
-        <p>{message}</p>
-      )}
+      {currentAccount !== "" && <p>{message}</p>}
       <div className="title">
         <h2>NFTアップローダー</h2>
       </div>
