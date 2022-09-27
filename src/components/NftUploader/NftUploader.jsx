@@ -61,6 +61,26 @@ const NftUploader = () => {
     }
   };
 
+  useEffect(() => {
+    const checkSignerAndNFTs = async () => {
+      const { ethereum } = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const connectedContract = new ethers.Contract(
+          CONTRACT_ADDRESS,
+          Web3Mint.abi,
+          signer
+        );
+        connectedContract !== web3MintContract && setWeb3MintContract(connectedContract);
+        const _remainingNFTs = 50 - await connectedContract.readCurrentTokenId();
+        _remainingNFTs !== remainingNFTs && setRemainingNFTs(_remainingNFTs);
+      }
+    };
+    checkSignerAndNFTs()
+  }, [currentAccount]);
+
   const connectWallet = async () =>{
     try {
       const { ethereum } = window;
@@ -89,15 +109,9 @@ const NftUploader = () => {
       const { ethereum } = window;
       if (ethereum) {
 
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        const signer = provider.getSigner();
-        const connectedContract = new ethers.Contract(
-          CONTRACT_ADDRESS,
-          Web3Mint.abi,
-          signer
-        );
         console.log("Going to pop wallet now to pay gas...");
-        let nftTxn = await connectedContract.mintIpfsNFT("sample",ipfs);
+
+        let nftTxn = await web3MintContract.mintIpfsNFT("sample",ipfs);
         let _message = "Mining...please wait.";
         console.log(_message);
         _message !== message && setMessage(_message);
@@ -117,6 +131,7 @@ const NftUploader = () => {
   };
 
   useEffect(() => {
+    const { ethereum } = window;
     let connectedContract;
   
     const onMintIpfsNFT = (_owner, _tokenId) => {
@@ -126,8 +141,8 @@ const NftUploader = () => {
       setRemainingNFTs(_remainingNFTs);
     };
 
-    if (window.ethereum) {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
+    if (ethereum) {
+      const provider = new ethers.providers.Web3Provider(ethereum);
       const signer = provider.getSigner();
       connectedContract = new ethers.Contract(
         CONTRACT_ADDRESS,
